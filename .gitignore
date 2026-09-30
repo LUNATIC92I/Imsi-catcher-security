@@ -1,0 +1,8 @@
+/storage/logs/*
+/storage/cache/*
+!/storage/logs/.gitkeep
+!/storage/cache/.gitkeep
+.env
+/vendor/
+*.log
+.DS_Store
