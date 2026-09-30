@@ -57,6 +57,20 @@ Ouvrir http://localhost:8080 — se connecter avec :
 | `analyst` | `analyst1234` | Analyste SOC |
 | `student` | `student1234` | Étudiant |
 
+### Démarrage sans Docker (SQLite, zéro infra)
+
+Pour une démo rapide ou un poste hors-ligne, aucune base MySQL n'est requise :
+
+```bash
+php database/seed_sqlite.php
+DB_CONNECTION=sqlite php -S 127.0.0.1:8080 -t public
+# → http://127.0.0.1:8080  (admin / admin1234)
+```
+
+Toutes les librairies front (Bootstrap, Chart.js, Leaflet, Cytoscape) sont
+**vendorisées** dans `public/assets/vendor/` : la plateforme fonctionne en
+environnement **air-gapped** (seules les tuiles de carte restent en ligne).
+
 Détails complets dans [INSTALLATION.md](INSTALLATION.md).
 
 ## Documentation

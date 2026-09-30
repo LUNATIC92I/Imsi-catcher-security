@@ -21,8 +21,8 @@ $nav = [
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= e($title ?? 'Lab') ?> — <?= e($appcfg['name']) ?></title>
 <meta name="csrf-token" content="<?= e($csrf) ?>">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="/assets/vendor/bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="/assets/css/app.css">
 </head>
 <body>
@@ -62,10 +62,9 @@ $nav = [
   </main>
 </div>
 
-<script>window.LUNATIC = { csrf: "<?= e($csrf) ?>" };</script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+<script src="/assets/vendor/chartjs/chart.umd.min.js"></script>
+<script src="/assets/vendor/leaflet/leaflet.js"></script>
+<script src="/assets/vendor/cytoscape/cytoscape.min.js"></script>
 <script src="/assets/js/app.js"></script>
 <?php if (!empty($page_script)): ?>
 <script src="/assets/js/<?= e($page_script) ?>.js"></script>

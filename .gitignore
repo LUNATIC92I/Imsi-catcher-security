@@ -6,3 +6,6 @@
 /vendor/
 *.log
 .DS_Store
+
+# Local SQLite demo DB
+/storage/*.sqlite

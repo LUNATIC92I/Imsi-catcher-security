@@ -45,12 +45,20 @@ final class StatsController extends Controller
     {
         $this->requireAuth($request);
         // Events per hour for the last 24 buckets (simulated data).
+        // Driver-aware date bucketing so the lab runs on MySQL and SQLite alike.
+        if (Database::driver() === 'sqlite') {
+            $bucket = "strftime('%Y-%m-%d %H:00', created_at)";
+            $since  = "datetime('now','-24 hours')";
+            $high   = "SUM(CASE WHEN risk_level IN ('HIGH','CRITICAL') THEN 1 ELSE 0 END)";
+        } else {
+            $bucket = "DATE_FORMAT(created_at, '%Y-%m-%d %H:00')";
+            $since  = 'NOW() - INTERVAL 24 HOUR';
+            $high   = "SUM(risk_level IN ('HIGH','CRITICAL'))";
+        }
         $rows = Database::all(
-            "SELECT DATE_FORMAT(created_at, '%Y-%m-%d %H:00') AS bucket,
-                    COUNT(*) AS events,
-                    SUM(risk_level IN ('HIGH','CRITICAL')) AS high
+            "SELECT {$bucket} AS bucket, COUNT(*) AS events, {$high} AS high
              FROM connection_events
-             WHERE created_at >= NOW() - INTERVAL 24 HOUR
+             WHERE created_at >= {$since}
              GROUP BY bucket ORDER BY bucket"
         );
         $this->json(['series' => $rows, 'simulation' => true]);

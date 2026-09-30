@@ -21,6 +21,9 @@ return [
     ],
 
     'db' => [
+        // 'mysql' (default, production) or 'sqlite' (local demo/dev only).
+        'connection'  => getenv('DB_CONNECTION') ?: 'mysql',
+        'sqlite_path' => getenv('DB_SQLITE_PATH') ?: (dirname(__DIR__) . '/storage/lunatic.sqlite'),
         'host'    => getenv('DB_HOST') ?: '127.0.0.1',
         'port'    => (int)(getenv('DB_PORT') ?: 3306),
         'name'    => getenv('DB_NAME') ?: 'lunatic_lab',
@@ -39,11 +42,14 @@ return [
         'rate_limit'        => ['window' => 60, 'max' => 120],
         'login_rate_limit'  => ['window' => 300, 'max' => 10],
         // CSP served by the app layer
+        // All JS/CSS are vendored locally (offline/air-gapped friendly), so the
+        // policy stays tight: scripts only from 'self', no inline execution.
+        // Map tiles are the only external resource (img-src), swappable offline.
         'csp' => "default-src 'self'; "
-               . "script-src 'self' https://cdn.jsdelivr.net https://unpkg.com; "
-               . "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
-               . "img-src 'self' data: https://*.tile.openstreetmap.org https://unpkg.com; "
-               . "font-src 'self' https://cdn.jsdelivr.net; "
+               . "script-src 'self'; "
+               . "style-src 'self' 'unsafe-inline'; "
+               . "img-src 'self' data: https://*.tile.openstreetmap.org; "
+               . "font-src 'self'; "
                . "connect-src 'self'",
     ],
 

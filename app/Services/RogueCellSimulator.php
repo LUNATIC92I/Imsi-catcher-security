@@ -25,11 +25,11 @@ final class RogueCellSimulator
     public function spawn(?string $operatorMcc = null): array
     {
         // Pick an arbitrary lab BTS to host the rogue cell (visual anchor).
-        $bts = Database::first('SELECT * FROM bts ORDER BY RAND() LIMIT 1');
+        $bts = Database::first('SELECT * FROM bts ORDER BY ' . Database::randExpr() . ' LIMIT 1');
         if ($bts === null) {
             throw new \RuntimeException('Aucune BTS de laboratoire disponible.');
         }
-        $operator = Database::first('SELECT * FROM operators ORDER BY RAND() LIMIT 1');
+        $operator = Database::first('SELECT * FROM operators ORDER BY ' . Database::randExpr() . ' LIMIT 1');
 
         $suffix = strtoupper(bin2hex(random_bytes(2)));
         $code = 'CELL-ROGUE-' . $suffix;

@@ -30,6 +30,17 @@ final class Database
         }
 
         $cfg = App::config('db');
+
+        // SQLite path (local demo/dev only) — no server, no credentials.
+        if (($cfg['connection'] ?? 'mysql') === 'sqlite') {
+            self::$pdo = new PDO('sqlite:' . $cfg['sqlite_path'], null, null, [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ]);
+            self::$pdo->exec('PRAGMA foreign_keys = ON');
+            return self::$pdo;
+        }
+
         $dsn = sprintf(
             'mysql:host=%s;port=%d;dbname=%s;charset=%s',
             $cfg['host'],
@@ -85,5 +96,17 @@ final class Database
     {
         self::run($sql, $params);
         return (int) self::connection()->lastInsertId();
+    }
+
+    /** Underlying driver name (e.g. "mysql", "sqlite"). */
+    public static function driver(): string
+    {
+        return (string) self::connection()->getAttribute(PDO::ATTR_DRIVER_NAME);
+    }
+
+    /** Portable random-order expression for ORDER BY. */
+    public static function randExpr(): string
+    {
+        return self::driver() === 'sqlite' ? 'RANDOM()' : 'RAND()';
     }
 }

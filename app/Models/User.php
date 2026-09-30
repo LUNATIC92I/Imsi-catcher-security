@@ -28,7 +28,7 @@ final class User extends Model
 
     public static function touchLogin(int $id): void
     {
-        Database::run('UPDATE users SET last_login_at = NOW() WHERE id = ?', [$id]);
+        Database::run('UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = ?', [$id]);
     }
 
     public static function create(string $username, string $email, string $plain, int $roleId): int

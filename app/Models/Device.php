@@ -20,6 +20,6 @@ final class Device extends Model {
         );
     }
     public static function random(int $n = 1): array {
-        return Database::all('SELECT * FROM devices ORDER BY RAND() LIMIT ?', [max(1,$n)]);
+        return Database::all('SELECT * FROM devices ORDER BY ' . Database::randExpr() . ' LIMIT ?', [max(1,$n)]);
     }
 }
