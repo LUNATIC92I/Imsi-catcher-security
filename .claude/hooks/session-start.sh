@@ -4,7 +4,14 @@
 # nothing to install. This hook performs a fast health check: PHP presence,
 # syntax lint of all PHP, and the dependency-free test suite. It is
 # idempotent and non-interactive.
+#
+# Runs in ASYNC mode: the session starts immediately and this health check
+# runs in the background. Safe because the hook installs nothing — no session
+# work depends on its completion.
 set -euo pipefail
+
+# Must be the first line of output to enable async mode.
+echo '{"async": true, "asyncTimeout": 120000}'
 
 cd "${CLAUDE_PROJECT_DIR:-.}"
 
