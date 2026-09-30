@@ -77,11 +77,15 @@ docker compose down -v              # arrêter + supprimer la base
 ## Vérification
 
 ```bash
-# Tests de logique (moteur de détection, export SOC) — sans base
-php -r "require 'app/Core/App.php';"        # doit s'exécuter sans erreur
+# Suite de tests (sans dépendance externe : logique + modèles/SQL sur SQLite)
+php tests/run.php                           # attendu : 33/33 passed
 # Lint complet
-find app public config database -name '*.php' -exec php -l {} \;
+find app public config database tests -name '*.php' -exec php -l {} \;
 ```
+
+> La suite couvre le moteur de détection (scores/priorités), l'export SOC
+> (`simulation:true`), le scoring, et le SQL des modèles (jointures, inserts,
+> Argon2id). Elle utilise SQLite en mémoire — aucune base MySQL requise.
 
 Après connexion :
 1. Ouvrir **Carte** → cliquer *« + Rogue cell simulée »*.

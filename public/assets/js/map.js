@@ -48,11 +48,19 @@ async function loadMap() {
 
 document.getElementById('btnReload').addEventListener('click', loadMap);
 document.getElementById('btnSpawn').addEventListener('click', async () => {
+  const btn = document.getElementById('btnSpawn');
+  btn.disabled = true;
   try {
     const r = await Api.post('/api/v1/simulation/rogue/spawn');
     toast('Rogue cell simulée créée : ' + r.rogue_cell.code, 'warn');
+    // Attract a few virtual devices so detection events are generated.
+    const lured = await Api.post('/api/v1/simulation/rogue/lure', { cell_id: r.rogue_cell.id, count: 5 });
+    const n = lured.result?.devices_lured ?? 0;
+    const crit = (lured.result?.results ?? []).filter(x => x.analysis?.risk_level === 'CRITICAL').length;
+    toast(`${n} appareils virtuels attirés · ${crit} détections CRITICAL`, 'err');
     await loadMap();
   } catch (e) { toast(e.message, 'err'); }
+  finally { btn.disabled = false; }
 });
 
 loadMap();
