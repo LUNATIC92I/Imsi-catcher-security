@@ -6,6 +6,7 @@ $csrf = $csrf ?? '';
 $auth = $auth ?? null;
 $nav = [
     'dashboard' => ['Dashboard', '▤', '/dashboard'],
+    'inventory' => ['Inventaire', '🗄', '/inventory'],
     'map'       => ['Carte', '🗺', '/map'],
     'graph'     => ['Graph Analysis', '⌗', '/graph'],
     'replay'    => ['Attack Replay', '▶', '/replay'],

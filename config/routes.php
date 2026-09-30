@@ -26,6 +26,7 @@ $router->post('/logout', [AuthController::class, 'logout'], [CsrfMiddleware::cla
 
 // --- Pages (auth enforced in controllers) ---
 $router->get('/dashboard', [PageController::class, 'dashboard']);
+$router->get('/inventory', [PageController::class, 'inventory']);
 $router->get('/map',       [PageController::class, 'map']);
 $router->get('/graph',     [PageController::class, 'graph']);
 $router->get('/replay',    [PageController::class, 'replay']);

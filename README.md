@@ -20,6 +20,7 @@ d'un IMSI catcher et surtout **les techniques de détection et de réponse**.
 | Module | Description |
 |--------|-------------|
 | **Dashboard SOC** | Appareils, cellules, anomalies, alertes, graphiques temps réel simulés (Chart.js) |
+| **Inventaire réseau** | Consultation filtrable des appareils et cellules (recherche, techno, rogue) |
 | **Simulation réseau** | BTS, cellules, opérateurs, téléphones et SIM virtuels |
 | **Rogue Base Station** | Création d'une fausse station simulée et attraction d'appareils virtuels |
 | **IMSI Exposure Simulator** | Génération d'événements d'exposition d'identifiants fictifs |

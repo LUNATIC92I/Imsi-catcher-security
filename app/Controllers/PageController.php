@@ -26,6 +26,13 @@ final class PageController extends Controller
         $this->view('pages/dashboard', ['title' => 'Dashboard', 'active' => 'dashboard']);
     }
 
+    public function inventory(Request $request): void
+    {
+        $this->requireAuth($request);
+        $this->audit('view_inventory');
+        $this->view('pages/inventory', ['title' => 'Inventaire réseau', 'active' => 'inventory']);
+    }
+
     public function map(Request $request): void
     {
         $this->requireAuth($request);
