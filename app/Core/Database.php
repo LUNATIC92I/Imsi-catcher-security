@@ -14,6 +14,15 @@ final class Database
 {
     private static ?PDO $pdo = null;
 
+    /**
+     * Inject a pre-built PDO connection. Intended for tests and alternative
+     * bootstraps; production uses connection() which reads config.
+     */
+    public static function setConnection(PDO $pdo): void
+    {
+        self::$pdo = $pdo;
+    }
+
     public static function connection(): PDO
     {
         if (self::$pdo instanceof PDO) {

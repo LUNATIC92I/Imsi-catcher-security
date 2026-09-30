@@ -31,7 +31,7 @@ $router->get('/graph',     [PageController::class, 'graph']);
 $router->get('/replay',    [PageController::class, 'replay']);
 $router->get('/soc',       [PageController::class, 'soc']);
 $router->get('/training',  [PageController::class, 'training']);
-$router->get('/audit',     [PageController::class, 'audit']);
+$router->get('/audit',     [PageController::class, 'auditPage']);
 
 // --- REST API v1 ---
 $api = [RateLimitMiddleware::class, ApiAuthMiddleware::class];

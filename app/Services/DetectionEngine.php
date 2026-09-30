@@ -28,23 +28,33 @@ final class DetectionEngine
      *                      known_cell_ids (array), device signal, etc.
      * @return array{score:int, risk_level:string, findings:array, anomaly_type:string}
      */
+    /**
+     * Classification priority when several rules fire at once. A confirmed
+     * unknown/rogue cell is the strongest root-cause signal, so it wins over
+     * secondary symptoms such as a downgrade it also triggers.
+     */
+    private const TYPE_PRIORITY = [
+        'unknown_cell', 'downgrade', 'identity_exposure',
+        'cell_spoofing', 'plmn_mismatch', 'high_power',
+    ];
+
     public function analyze(array $cell, array $ctx = []): array
     {
         $score = 0;
         $findings = [];
-        $primaryType = 'normal';
+        $types = [];   // candidate anomaly types, resolved by priority below
 
         // Rule 1: unknown / rogue cell
         if (!empty($cell['is_rogue']) || (isset($cell['is_legitimate']) && !$cell['is_legitimate'])) {
             $score += 45;
             $findings[] = ['rule' => 'unknown_cell', 'weight' => 45,
                 'reason' => 'Cellule non répertoriée dans la base légitime (rogue simulée)'];
-            $primaryType = 'unknown_cell';
+            $types[] = 'unknown_cell';
         } elseif (!empty($ctx['known_cell_ids']) && !in_array((int) $cell['cell_id_num'], $ctx['known_cell_ids'], true)) {
             $score += 20;
             $findings[] = ['rule' => 'unlisted_cell_id', 'weight' => 20,
                 'reason' => 'Cell ID absent de la liste connue'];
-            if ($primaryType === 'normal') { $primaryType = 'unknown_cell'; }
+            $types[] = 'unknown_cell';
         }
 
         // Rule 2: abnormally high transmit power (attracts devices)
@@ -53,7 +63,7 @@ final class DetectionEngine
             $score += 25;
             $findings[] = ['rule' => 'high_power', 'weight' => 25,
                 'reason' => "Puissance anormalement élevée ({$power} dBm)"];
-            if ($primaryType === 'normal') { $primaryType = 'high_power'; }
+            $types[] = 'high_power';
         } elseif ($power > -60) {
             $score += 10;
             $findings[] = ['rule' => 'elevated_power', 'weight' => 10,
@@ -74,7 +84,7 @@ final class DetectionEngine
                 $score += $weight;
                 $findings[] = ['rule' => 'downgrade', 'weight' => $weight,
                     'reason' => "Downgrade technologique {$prev} → {$tech}" . ($isTo2G ? ' (2G non chiffré)' : '')];
-                $primaryType = 'downgrade';
+                $types[] = 'downgrade';
             }
         }
 
@@ -83,13 +93,13 @@ final class DetectionEngine
             $score += 20;
             $findings[] = ['rule' => 'mcc_mismatch', 'weight' => 20,
                 'reason' => "MCC inattendu ({$cell['mcc']} au lieu de {$ctx['expected_mcc']})"];
-            if ($primaryType === 'normal') { $primaryType = 'plmn_mismatch'; }
+            $types[] = 'plmn_mismatch';
         }
         if (isset($ctx['expected_mnc'], $cell['mnc']) && (string) $ctx['expected_mnc'] !== (string) $cell['mnc']) {
             $score += 15;
             $findings[] = ['rule' => 'mnc_mismatch', 'weight' => 15,
                 'reason' => "MNC inattendu ({$cell['mnc']})"];
-            if ($primaryType === 'normal') { $primaryType = 'plmn_mismatch'; }
+            $types[] = 'plmn_mismatch';
         }
 
         // Rule 5: sudden cell change / implausible mobility
@@ -104,7 +114,7 @@ final class DetectionEngine
             $score += 20;
             $findings[] = ['rule' => 'identity_request', 'weight' => 20,
                 'reason' => "Requête d'identité (IMSI) inhabituelle à l'attachement"];
-            if ($primaryType === 'normal') { $primaryType = 'identity_exposure'; }
+            $types[] = 'identity_exposure';
         }
 
         // Rule 7: inconsistent Cell ID / LAC combination
@@ -112,7 +122,7 @@ final class DetectionEngine
             $score += 15;
             $findings[] = ['rule' => 'inconsistent_cell_id', 'weight' => 15,
                 'reason' => 'Cell ID incohérent avec le LAC/TAC annoncé'];
-            if ($primaryType === 'normal') { $primaryType = 'cell_spoofing'; }
+            $types[] = 'cell_spoofing';
         }
 
         $score = min(100, $score);
@@ -120,9 +130,20 @@ final class DetectionEngine
             'score'        => $score,
             'risk_level'   => $this->level($score),
             'findings'     => $findings,
-            'anomaly_type' => $primaryType,
+            'anomaly_type' => $this->resolveType($types),
             'simulation'   => true,
         ];
+    }
+
+    /** Pick the highest-priority anomaly type among those that fired. */
+    private function resolveType(array $types): string
+    {
+        foreach (self::TYPE_PRIORITY as $candidate) {
+            if (in_array($candidate, $types, true)) {
+                return $candidate;
+            }
+        }
+        return 'normal';
     }
 
     public function level(int $score): string

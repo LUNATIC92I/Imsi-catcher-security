@@ -56,7 +56,7 @@ final class PageController extends Controller
         $this->view('pages/training', ['title' => 'Training', 'active' => 'training']);
     }
 
-    public function audit(Request $request): void
+    public function auditPage(Request $request): void
     {
         $this->requirePermission($request, 'audit.view');
         $this->view('pages/audit', ['title' => 'Audit', 'active' => 'audit']);

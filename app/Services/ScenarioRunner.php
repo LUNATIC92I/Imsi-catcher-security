@@ -122,17 +122,20 @@ final class ScenarioRunner
             'reason'       => $analysis['findings'][0]['reason'] ?? 'Comportement anormal simulé',
         ]);
 
-        $eventTypeMap = [
+        // The scenario category is what the exercise is teaching, so it drives
+        // the alert label; detection drives the severity.
+        $categoryEventMap = [
             'downgrade'         => 'DOWNGRADE_ATTACK_DETECTED',
             'identity_exposure' => 'IMSI_EXPOSURE_DETECTED',
             'cell_spoofing'     => 'CELL_SPOOFING_DETECTED',
-            'unknown_cell'      => 'ROGUE_CELL_DETECTED',
+            'location_tracking' => 'LOCATION_TRACKING_DETECTED',
+            'rogue_cell'        => 'ROGUE_CELL_DETECTED',
         ];
         $alertId = Alert::log([
             'anomaly_id' => $anomalyId,
             'device_id'  => (int) $device['id'],
             'cell_id'    => null,
-            'event_type' => $eventTypeMap[$analysis['anomaly_type']] ?? 'ROGUE_CELL_DETECTED',
+            'event_type' => $categoryEventMap[$category] ?? 'ROGUE_CELL_DETECTED',
             'severity'   => $analysis['risk_level'],
             'message'    => "Scénario {$category}: menace simulée détectée sur {$device['code']}.",
         ]);
