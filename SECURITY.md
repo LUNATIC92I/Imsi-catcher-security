@@ -59,6 +59,21 @@ Chaque alerte exportée porte `"simulation": true`. Le journal d'audit
 - Restreindre l'accès réseau au port `3307` (MariaDB) hors développement.
 - `expose_php=0`, `display_errors=Off` (déjà appliqués dans l'image PHP).
 
+## Revue de sécurité (audit interne)
+
+Une revue manuelle du code a été menée sur l'ensemble de la base :
+
+- **Injection SQL** : aucune. Toutes les valeurs passent par des requêtes
+  préparées ; seuls des noms de tables statiques (jamais issus de l'utilisateur)
+  et des constantes de driver (RAND/RANDOM, format de date) sont interpolés.
+- **XSS** : aucune sortie d'entrée brute côté serveur ; échappement via `e()`
+  (vues) et `esc()` (JS). CSP stricte sans `'unsafe-inline'` pour les scripts.
+- **Injection d'en-tête / open redirect** : `Response::redirect()` supprime
+  CR/LF/NUL et n'accepte que des chemins relatifs à l'application (rejet des
+  cibles absolues et protocol-relatives).
+- **Exécution de commandes** : aucun `eval/system/exec/shell_exec/passthru`.
+- **Divulgation d'erreurs** : traces masquées hors `APP_DEBUG`.
+
 ## Signalement
 
 Cet environnement est pédagogique et isolé. Pour toute question de sécurité liée

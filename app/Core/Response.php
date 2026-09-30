@@ -30,6 +30,13 @@ final class Response
 
     public static function redirect(string $to, int $status = 302): never
     {
+        // Defense-in-depth: strip CR/LF (header injection) and refuse
+        // absolute/protocol-relative targets (open redirect). Only same-app
+        // relative paths are honoured; anything else falls back to '/'.
+        $to = str_replace(["\r", "\n", "\0"], '', $to);
+        if ($to === '' || $to[0] !== '/' || str_starts_with($to, '//')) {
+            $to = '/';
+        }
         header('Location: ' . $to, true, $status);
         exit;
     }
