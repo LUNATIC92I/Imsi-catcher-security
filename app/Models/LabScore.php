@@ -10,6 +10,11 @@ final class LabScore extends Model {
             [$userId, $scenarioId, $points, $category, $detail]
         );
     }
+    public static function hasObjective(int $userId, string $category): bool {
+        return (bool) Database::scalar(
+            'SELECT COUNT(*) FROM lab_scores WHERE user_id = ? AND category = ?', [$userId, $category]
+        );
+    }
     public static function totalFor(int $userId): int {
         return (int) Database::scalar('SELECT COALESCE(SUM(points),0) FROM lab_scores WHERE user_id = ?', [$userId]);
     }

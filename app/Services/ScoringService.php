@@ -25,6 +25,11 @@ final class ScoringService
         if ($points === 0) {
             return ['awarded' => 0, 'error' => 'Objectif inconnu'];
         }
+        // Each objective counts once per user, so the total can never exceed
+        // the advertised maximum and the leaderboard cannot be farmed.
+        if (LabScore::hasObjective($userId, $objective)) {
+            return ['awarded' => 0, 'error' => 'Objectif déjà validé', 'total' => LabScore::totalFor($userId)];
+        }
         LabScore::award($userId, $scenarioId, $points, $objective, 'Objectif validé: ' . $objective);
         return [
             'awarded' => $points,

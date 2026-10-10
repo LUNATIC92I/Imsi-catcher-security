@@ -24,7 +24,7 @@ services:
       DB_USER: ${DB_USER:-lunatic}
       DB_PASS: ${DB_PASS:-lunatic_secret}
       APP_ENV: ${APP_ENV:-local}
-      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_DEBUG: ${APP_DEBUG:-false}
     volumes:
       - ./:/var/www/html
     depends_on:

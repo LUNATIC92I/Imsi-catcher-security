@@ -19,11 +19,23 @@ final class RateLimiter
         );
 
         if ($row === null) {
-            Database::insert(
-                'INSERT INTO rate_limits (bucket, hits, window_start) VALUES (?, 1, ?)',
-                [$key, $windowStart]
-            );
-            return true;
+            try {
+                Database::insert(
+                    'INSERT INTO rate_limits (bucket, hits, window_start) VALUES (?, 1, ?)',
+                    [$key, $windowStart]
+                );
+                return true;
+            } catch (\PDOException) {
+                // A concurrent request created the bucket first (unique key):
+                // count this hit against that row instead of failing with a 500.
+                $row = Database::first(
+                    'SELECT id, hits, window_start FROM rate_limits WHERE bucket = ?',
+                    [$key]
+                );
+                if ($row === null) {
+                    throw new \RuntimeException('Rate limiter bucket unavailable');
+                }
+            }
         }
 
         if ((int) $row['window_start'] !== $windowStart) {

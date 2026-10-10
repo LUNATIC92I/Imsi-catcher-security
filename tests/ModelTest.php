@@ -51,4 +51,22 @@ return static function (): void {
     LabScore::award(1, null, 20, 'identify_downgrade', 'ok');
     T::eq('LabScore total', 40, LabScore::totalFor(1));
     T::eq('Leaderboard top', 40, (int) (LabScore::leaderboard(5)[0]['total'] ?? 0));
+
+    // ScoringService: an objective is only awarded once per user
+    $svc = new \App\Services\ScoringService();
+    T::eq('Scoring new objective', 20, $svc->award(1, 'analyze_graph')['awarded']);
+    T::eq('Scoring duplicate refused', 0, $svc->award(1, 'analyze_graph')['awarded']);
+    T::eq('Scoring unknown refused', 0, $svc->award(1, 'nope')['awarded']);
+    foreach (array_keys(\App\Services\ScoringService::OBJECTIVES) as $obj) {
+        $svc->award(1, $obj);
+        $svc->award(1, $obj);
+    }
+    T::eq('Scoring capped at max', 100, LabScore::totalFor(1));
+
+    // Rate limiter: allows up to max hits per window, then blocks
+    $hits = 0;
+    for ($i = 0; $i < 5; $i++) {
+        $hits += \App\Core\RateLimiter::allow('test:bucket', 3, 60) ? 1 : 0;
+    }
+    T::eq('RateLimiter caps hits', 3, $hits);
 };

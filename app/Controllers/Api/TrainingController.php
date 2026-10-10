@@ -9,8 +9,8 @@ final class TrainingController extends Controller {
     public function submitQuiz(Request $request): void {
         $this->requireAuth($request);
         $module = (string) $request->input('module', 'general');
-        $score  = max(0, (int) $request->input('score', 0));
-        $total  = max(0, (int) $request->input('total', 0));
+        $total  = max(0, min(100, (int) $request->input('total', 0)));
+        $score  = max(0, min($total, (int) $request->input('score', 0)));
         Database::insert(
             'INSERT INTO quiz_results (user_id, module, score, total) VALUES (?,?,?,?)',
             [(int) Auth::id(), substr($module,0,60), $score, $total]

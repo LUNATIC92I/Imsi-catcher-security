@@ -36,7 +36,11 @@ final class SimulationController extends Controller
             $this->json(['error' => 'cell_id requis'], 422);
         }
         $sim = new RogueCellSimulator();
-        $result = $sim->lureDevices($cellId, $count);
+        try {
+            $result = $sim->lureDevices($cellId, $count);
+        } catch (\RuntimeException $e) {
+            $this->json(['error' => $e->getMessage()], 422);
+        }
         $this->audit('lure_devices', ['cell_id' => $cellId, 'count' => $result['devices_lured']], 'rogue_cell');
         $this->json(['ok' => true, 'result' => $result, 'simulation' => true]);
     }

@@ -14,6 +14,8 @@ final class Auth
             return;
         }
         $cfg = App::config('security');
+        // Reject uninitialised session IDs (session fixation), even outside Docker.
+        ini_set('session.use_strict_mode', '1');
         session_name($cfg['session_name']);
         session_set_cookie_params([
             'lifetime' => $cfg['session_lifetime'],
@@ -52,6 +54,17 @@ final class Auth
     public static function logout(): void
     {
         $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $p = session_get_cookie_params();
+            setcookie(session_name(), '', [
+                'expires'  => time() - 42000,
+                'path'     => $p['path'],
+                'domain'   => $p['domain'],
+                'secure'   => $p['secure'],
+                'httponly' => $p['httponly'],
+                'samesite' => $p['samesite'],
+            ]);
+        }
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_destroy();
         }

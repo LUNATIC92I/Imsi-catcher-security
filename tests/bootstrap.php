@@ -63,6 +63,7 @@ CREATE TABLE connection_events(id INTEGER PRIMARY KEY AUTOINCREMENT,device_id IN
 CREATE TABLE anomalies(id INTEGER PRIMARY KEY AUTOINCREMENT,event_id INT,device_id INT,cell_id INT,anomaly_type TEXT,risk_level TEXT,score INT DEFAULT 0,reason TEXT,is_simulated INT DEFAULT 1,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE alerts(id INTEGER PRIMARY KEY AUTOINCREMENT,anomaly_id INT,device_id INT,cell_id INT,event_type TEXT,severity TEXT,status TEXT DEFAULT 'open',message TEXT,soc_exported INT DEFAULT 0,simulation INT DEFAULT 1,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE handovers(id INTEGER PRIMARY KEY AUTOINCREMENT,device_id INT,from_cell_id INT,to_cell_id INT,reason TEXT,is_simulated INT DEFAULT 1,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE rate_limits(id INTEGER PRIMARY KEY AUTOINCREMENT,bucket TEXT UNIQUE,hits INT DEFAULT 1,window_start INT);
 CREATE TABLE lab_scores(id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INT,scenario_id INT,points INT DEFAULT 0,max_points INT DEFAULT 100,category TEXT,detail TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
 SQL);
     return $pdo;

@@ -14,7 +14,7 @@ return [
         'name'     => 'LUNATIC MOBILE SECURITY LAB',
         'tagline'  => 'Mobile Network Security Simulation Platform',
         'env'      => getenv('APP_ENV') ?: 'local',
-        'debug'    => filter_var(getenv('APP_DEBUG') ?: 'true', FILTER_VALIDATE_BOOL),
+        'debug'    => filter_var(getenv('APP_DEBUG') ?: 'false', FILTER_VALIDATE_BOOL),
         'base_url' => getenv('APP_BASE_URL') ?: '',
         // Hard guarantee, enforced across the codebase.
         'simulation_only' => true,

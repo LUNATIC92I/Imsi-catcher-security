@@ -72,7 +72,15 @@ Une revue manuelle du code a été menée sur l'ensemble de la base :
   CR/LF/NUL et n'accepte que des chemins relatifs à l'application (rejet des
   cibles absolues et protocol-relatives).
 - **Exécution de commandes** : aucun `eval/system/exec/shell_exec/passthru`.
-- **Divulgation d'erreurs** : traces masquées hors `APP_DEBUG`.
+- **Divulgation d'erreurs** : traces masquées hors `APP_DEBUG`, qui vaut
+  désormais `false` par défaut si la variable n'est pas définie.
+- **Intégrité du scoring** : chaque objectif n'est attribué qu'une seule fois
+  par utilisateur (total plafonné à 100) ; les scores de quiz sont bornés
+  (`0 ≤ score ≤ total ≤ 100`).
+- **Sessions** : `session.use_strict_mode` forcé par l'application (pas
+  seulement dans l'image Docker) ; le cookie de session est expiré au logout.
+- **Rate limiter** : une création concurrente du même compteur ne provoque plus
+  d'erreur 500 (repli sur la ligne existante).
 
 ## Signalement
 
